@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, FlatList, Text, StyleSheet, PermissionsAndroid, Alert } from 'react-native';
 import { useLlmInference, LlmInferenceConfig } from 'react-native-llm-mediapipe';
@@ -42,7 +44,7 @@ export default function Index() {
     storageType: 'asset', // use 'file' to store the model on the device internal storage instead
     // modelPath: '/data/local/tmp/llm/gemma2-2b-it-cpu-int8.bin',
     
-    modelName: 'pytorch_model.bin', // place it in /android/app/src/main/assets/ folder
+    modelName: 'gemma-2b-it-cpu-int4.bin', // place it in /android/app/src/main/assets/ folder
   }
   // const [generateResponse, setGenerateResponse] = useState<null | Function>(null);
 
@@ -56,8 +58,13 @@ export default function Index() {
   //   });
   // }, []);
 
+  // useEffect(() => {
+  //   const newId = uuidv4();
+  //   setId(newId);
+  // }, []);
+
   useEffect(() => {
-    const newId = uuidv4();
+    const newId = Math.random().toString(36).substring(7);
     setId(newId);
   }, []);
 
@@ -133,3 +140,4 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 });
+
