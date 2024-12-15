@@ -12,11 +12,19 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
+import io.objectbox.BoxStore;
 
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
 
 class MainApplication : Application(), ReactApplication {
+
+  companion object {
+    private var boxStore: BoxStore? = null
+    fun getBoxStore(): BoxStore? {
+      return boxStore
+    }
+  }
 
   override val reactNativeHost: ReactNativeHost = ReactNativeHostWrapper(
         this,
@@ -25,6 +33,7 @@ class MainApplication : Application(), ReactApplication {
             val packages = PackageList(this).packages
             // Packages that cannot be autolinked yet can be added manually here, for example:
             // packages.add(new MyReactNativePackage());
+            packages.add(new ObjectBoxPackage())
             return packages
           }
 
@@ -48,6 +57,7 @@ class MainApplication : Application(), ReactApplication {
       load()
     }
     ApplicationLifecycleDispatcher.onApplicationCreate(this)
+    boxStore = MyObjectBox.builder().androidContext(this).build()
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

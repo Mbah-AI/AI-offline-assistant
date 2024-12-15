@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useLlmInference, LlmInferenceConfig } from 'react-native-llm-mediapipe';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { initializeDatabase } from '../utils/init_db'
 
 interface Message {
   message: string;
@@ -34,6 +35,10 @@ export default function Index() {
   useEffect(() => {
     const newId = Math.random().toString(36).substring(7);
     setId(newId);
+  }, []);
+
+  useEffect(() => {
+    initializeDatabase();
   }, []);
 
   const { generateResponse } = useLlmInference(config);
