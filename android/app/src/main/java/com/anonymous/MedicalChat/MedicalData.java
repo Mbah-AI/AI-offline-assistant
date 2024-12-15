@@ -9,12 +9,22 @@ public class MedicalData {
     @Id
     public long id;
 
+    @Index
     public String textData;
+
+    @Vector
+    public float[] textDataEmbedding;
 
     public String textSource
 
-    public MedicalData(String data, source) {
-        this.textData = data;
-        this.textSource = source
+    public MedicalData(long id, String textData, String textSource, float[] textDataEmbedding) {
+        this.id = id;
+        this.textData = textData;
+        this.textSource = textSource;
+        this.textDataEmbedding = textDataEmbedding;
+    }
+
+    // No-argument constructor required by ObjectBox
+    public MedicalData() {
     }
 }

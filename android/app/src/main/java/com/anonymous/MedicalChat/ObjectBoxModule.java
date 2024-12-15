@@ -32,13 +32,18 @@ public class ObjectBoxModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void insertEntity(String textData, String textSource, Promise promise) {
+    public void insertEntity(String textData, String textSource, ReadableArray textDataEmbedding, Promise promise) {
         try {
-            Box<MedicalData> MedicalDataBox = boxStore.boxFor(MedicalData.class);
-            MedicalData data = new MedicalData(textData, textSource);
-            long id = MedicalDataBox.put(data);
+            float[] embedding = new float[textDataEmbedding.size()];
+            for (int i = 0; i < textDataEmbedding.size(); i++) {
+                embedding[i] = (float) textDataEmbedding.getDouble(i); // Convert to float
+            }
+            MedicalData data = new MedicalData(0, textData, textSource, embedding);
+            Box<MedicalData> medicalDataBox = boxStore.boxFor(MedicalData.class);
+            long id = medicalDataBox.put(data);
             promise.resolve(id);
         } catch (Exception e) {
+            // Reject the promise with an error if something goes wrong
             promise.reject("ERROR_INSERT", e);
         }
     }
@@ -64,17 +69,24 @@ public class ObjectBoxModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getMatchingEntities(String searchTerm, Promise promise) {
+    public void getMatchingEntities(ReadableArray queryEmbedding, Promise promise) {
         try {
+            // Convert the JS float array (ReadableArray) to a Java float array
+            float[] queryVector = new float[queryEmbedding.size()];
+            for (int i = 0; i < queryEmbedding.size(); i++) {
+                queryVector[i] = (float) queryEmbedding.getDouble(i);
+            }
+
             Box<MedicalData> medicalDataBox = boxStore.boxFor(MedicalData.class);
-            // Simple query that looks for the term within the textData
+
             Query<MedicalData> query = medicalDataBox.query()
-                    .contains(MedicalData_.textData, searchTerm)
+                    .vector(MedicalData_.textDataEmbedding)
+                    .nearestNeighbor(queryVector, 5)
                     .build();
-    
+
             List<MedicalData> matchingEntities = query.find();
             List<Map<String, Object>> result = new ArrayList<>();
-    
+
             for (MedicalData e : matchingEntities) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", e.id);
@@ -82,9 +94,7 @@ public class ObjectBoxModule extends ReactContextBaseJavaModule {
                 map.put("textSource", e.textSource);
                 result.add(map);
             }
-    
             promise.resolve(Arguments.makeNativeArray(result));
-    
         } catch (Exception e) {
             promise.reject("ERROR_SEARCH", e);
         }

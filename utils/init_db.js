@@ -7,14 +7,15 @@ export const initializeDatabase = async () => {
       console.log('Database already contains data. Skipping initialization.');
       return;
     }
+    const textDataEmbedding = new Float32Array([0.1, 0.2, 0.3, 0.4]);
     const entities = [
-      { textData: 'Example text 1', textSource: 'Source A' },
-      { textData: 'Example text 2', textSource: 'Source B' },
-      { textData: 'Example text 3', textSource: 'Source C' },
+      { textData: 'Example text 1', textSource: 'Source A', textDataEmbedding },
+      { textData: 'Example text 2', textSource: 'Source B', textDataEmbedding },
+      { textData: 'Example text 3', textSource: 'Source C', textDataEmbedding },
     ];
 
     for (let entity of entities) {
-      const id = await ObjectBox.insertEntity(entity.textData, entity.textSource);
+      const id = await ObjectBox.insertEntity(entity.textData, entity.textSource, entity.textDataEmbedding);
       console.log(`Inserted entity with ID: ${id}`);
     }
 
